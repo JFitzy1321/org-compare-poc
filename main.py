@@ -63,8 +63,11 @@ if __name__ == "__main__":
     while True:
         try:
             index1 = int(input(f"Enter number between 0 and {size_org_list} for Org 1: "))
+            if index1 > size_org_list:
+                raise Exception
+
             index2 = int(input(f"Enter number between 0 and {size_org_list} for Org 2: "))
-            if index1 > size_org_list or index2 > size_org_list:
+            if index2 > size_org_list:
                 raise Exception
 
         except KeyboardInterrupt as kie:
