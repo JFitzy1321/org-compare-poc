@@ -1,11 +1,16 @@
 import pandas as pd
 
+# Keys so I don't mess up spelling these over and over again
+ORG_ID = "OrganizationUnitID"
+H_LEVEL = "HierarchyLevel"
+H_STRING = "HierarchyString"
+
 # Represents OrganizationUnit Class from Cayuse Data Models
 class OrgUnit:
-    def __init__(self, OrganizationUnitID: str, HierarchyLevel: int, HierarchyString: str):
-        self.id = OrganizationUnitID
-        self.h_level = HierarchyLevel
-        self.h_string = HierarchyString
+    def __init__(self, **kwargs):
+        self.id = kwargs[ORG_ID]
+        self.h_level = kwargs[H_LEVEL]
+        self.h_string = kwargs[H_STRING]
         self._levels = []  # Hierarchical Levels in list form
 
     def get_levels(self):
@@ -17,7 +22,7 @@ class OrgUnit:
         return self._levels
 
     def __repr__(self):
-        return f"<OrgUnit Id: '{self.id}'  HierarchyLevel: {self.h_level}  HierarchyString: '{self.h_string}' />"
+        return f"<OrgUnit {ORG_ID}: '{self.id}'  {H_LEVEL}: {self.h_level}  {H_STRING}: '{self.h_string}' />"
 
 
 def orgs_are_in_same_branch(org1, org2):
@@ -25,8 +30,7 @@ def orgs_are_in_same_branch(org1, org2):
     if org1.id == org2.id:
         return True
 
-    org1_level = org1.h_level
-    org2_level = org2.h_level
+    org1_level, org2_level = org1.h_level, org2.h_level
 
     # if orgs are root level, then they aren't related
     if org1_level == 1 and org2_level == 1:
@@ -39,7 +43,7 @@ def orgs_are_in_same_branch(org1, org2):
     else:
         lowest_common_level = org1_level if org1_level < org2_level else org2_level
 
-    print("Lowest Common Hierarchy Level between Orgs: ", lowest_common_level)
+    print(f"Lowest Common Hierarchy Level between Orgs: {lowest_common_level}")
 
     # slice lists to common length to compare parent relationship
     print(level_list_1 := org1.get_levels()[:lowest_common_level])
@@ -53,11 +57,13 @@ if __name__ == "__main__":
     # Import csv file with pandas for easy of use
     df = pd.read_csv("org-units-poc1.csv")
 
-    # get the fields we care about into a workable list of dict objects
-    _org_data = df[["HierarchyString", "OrganizationUnitID", "HierarchyLevel"]].to_dict("records")
+    # get the fields we care about into a workable list of key-value pairs
+    _org_data = df[[ORG_ID, H_LEVEL, H_STRING]].to_dict("records")
 
     # get a list of OrgUnit class from object above
-    list_size = len(org_list := [OrgUnit(**kwargs) for kwargs in _org_data])
+    org_list = [OrgUnit(**kwargs) for kwargs in _org_data]
+    list_size = len(org_list)
+
     while True:
         # Get indexes from user to compare org objects
         # Throw exceptions if input is not a number, or number is Out of Bounds
@@ -85,7 +91,7 @@ if __name__ == "__main__":
         print(f"OrgUnit @ Index {index2}: {org2}")
 
         # Do the comparison and display results
-        print("Are Orgs in the same Hierarchy: ", orgs_are_in_same_branch(org1, org2))
+        print(f"Are Orgs in the same Hierarchy: {orgs_are_in_same_branch(org1, org2)}")
         print("\n")
 
         # Loop again or exit?
