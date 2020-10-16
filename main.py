@@ -25,7 +25,7 @@ class OrgUnit:
         return f"<OrgUnit {ORG_ID}: '{self.id}'  {H_LEVEL}: {self.h_level}  {H_STRING}: '{self.h_string}' />"
 
 
-def orgs_are_in_same_branch(org1, org2):
+def orgs_are_in_same_branch(org, org2):
     # if comparing the same object, return true
     if org1.id == org2.id:
         return True
@@ -77,8 +77,8 @@ if __name__ == "__main__":
             if index2 > list_size:
                 raise Exception
 
-        except KeyboardInterrupt as kie:
-            raise kie  # Send Interrupt up the stack
+        except KeyboardInterrupt as kbi:
+            raise kbi  # Send Interrupt up the stack
         except:
             print("Invalid input, try again")
             continue
