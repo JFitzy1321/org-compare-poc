@@ -13,13 +13,13 @@ class OrgUnit:
         self.h_string = kwargs[H_STRING]
         self._levels = []  # Hierarchical Levels in list form
 
-    def get_levels(self):
+    def get_levels(self, upper_bound=None):
         # get individual hierarchy levels by spliting the string by '/'
         # then using 'Falsy' value to remove empty strings
         if not self._levels:
             self._levels = [int(level) for level in self.h_string.split("/") if level]
 
-        return self._levels
+        return self._levels[:upper_bound] if upper_bound else self._levels
 
     def __repr__(self):
         return f"<OrgUnit {ORG_ID}: '{self.id}'  {H_LEVEL}: {self.h_level}  {H_STRING}: '{self.h_string}' />"
@@ -46,11 +46,12 @@ def orgs_are_in_same_branch(org1, org2):
     print(f"Lowest Common Hierarchy Level between Orgs: {lowest_common_level}")
 
     # slice lists to common length to compare parent relationship
-    print(level_list_1 := org1.get_levels()[:lowest_common_level])
-    print(level_list_2 := org2.get_levels()[:lowest_common_level])
+    parent_list1, parent_list2 = org1.get_levels(lowest_common_level), org2.get_levels(lowest_common_level)
+    print(f"Parent Hierarchy of Org 1: {parent_list1}")
+    print(f"Parent Hierarchy of Org 2: {parent_list2}")
 
     # check if the lists are the same
-    return level_list_1 == level_list_2
+    return parent_list1 == parent_list2
 
 
 if __name__ == "__main__":
@@ -85,8 +86,7 @@ if __name__ == "__main__":
             print()  # new line
 
         # Get and Show orgs from list, provided by user entered indexes
-        org1 = org_list[index1]
-        org2 = org_list[index2]
+        org1, org2 = org_list[index1], org_list[index2]
         print(f"OrgUnit @ Index {index1}: {org1}")
         print(f"OrgUnit @ Index {index2}: {org2}")
 
