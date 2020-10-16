@@ -54,24 +54,24 @@ if __name__ == "__main__":
     df = pd.read_csv("org-units-poc1.csv")
 
     # get the fields we care about into a workable list of dict objects
-    _org_list = df[["HierarchyString", "OrganizationUnitID", "HierarchyLevel"]].to_dict("records")
+    _org_data = df[["HierarchyString", "OrganizationUnitID", "HierarchyLevel"]].to_dict("records")
 
     # get a list of OrgUnit class from object above
-    org_list = [OrgUnit(**kwargs) for kwargs in _org_list]
-
-    size_org_list = len(org_list)
+    list_size = len(org_list := [OrgUnit(**kwargs) for kwargs in _org_data])
     while True:
+        # Get indexes from user to compare org objects
+        # Throw exceptions if input is not a number, or number is Out of Bounds
         try:
-            index1 = int(input(f"Enter number between 0 and {size_org_list} for Org 1: "))
-            if index1 > size_org_list:
+            index1 = int(input(f"Enter number between 0 and {list_size} for Org 1: "))
+            if index1 > list_size:
                 raise Exception
 
-            index2 = int(input(f"Enter number between 0 and {size_org_list} for Org 2: "))
-            if index2 > size_org_list:
+            index2 = int(input(f"Enter number between 0 and {list_size} for Org 2: "))
+            if index2 > list_size:
                 raise Exception
 
         except KeyboardInterrupt as kie:
-            raise kie
+            raise kie  # Send Interrupt up the stack
         except:
             print("Invalid input, try again")
             continue
@@ -84,9 +84,11 @@ if __name__ == "__main__":
         print(f"OrgUnit @ Index {index1}: {org1}")
         print(f"OrgUnit @ Index {index2}: {org2}")
 
+        # Do the comparison and display results
         print("Are Orgs in the same Hierarchy: ", orgs_are_in_same_branch(org1, org2))
         print("\n")
 
+        # Loop again or exit?
         if input("Again? y/n : ").lower() in ("y", ""):
             continue
         else:
