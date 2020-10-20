@@ -1,35 +1,69 @@
+"""Organization Unit Hierarchical Comparer Proof of Concept."""
+
 from functools import lru_cache
 from typing import Optional
 
 import pandas as pd
 
-# Keys so I don't mess up spelling these over and over again
+# Org Keys (so i don't misspell anything)
 ORG_ID = "OrganizationUnitID"
 H_LEVEL = "HierarchyLevel"
 H_STRING = "HierarchyString"
 
 # Represents OrganizationUnit Class from Cayuse Data Models
 class OrgUnit:
+    """
+    A Representation of the FM OrganizationUnit in Python.
+
+    For this POC, I only care about these fields:
+
+            OrganizationUnitID
+            Hierarchy Level
+            Hierarchy String
+    """
+
     def __init__(self, **kwargs):
+        """Init method."""
         self.id: str = kwargs[ORG_ID]
         self.h_level: int = kwargs[H_LEVEL]
         self.h_string: str = kwargs[H_STRING]
         self._levels: list[int] = []
 
     def get_levels(self, upper_bound: Optional[int]) -> list[int]:
-        # get individual hierarchy levels by spliting the string by '/'
-        # then using 'Falsy' value to remove empty strings
+        """Get a list of Hierarchy Levels by splitting Hierarchy String into ints."""
         if not self._levels:
+            # get / 1 / 2 / 3 levels by splitting string, using falsy check to remove whitespace
+            # then casting to int, all in a list comprehension
             self._levels = [int(level) for level in self.h_string.split("/") if level]
 
-        return self._levels[:upper_bound] if upper_bound and upper_bound < len(self._levels) else self._levels
+        return (
+            self._levels[:upper_bound]
+            if upper_bound and upper_bound < len(self._levels)
+            else self._levels
+        )
 
     def __repr__(self):
-        return f"<OrgUnit {ORG_ID}: '{self.id}'  {H_LEVEL}: {self.h_level}  {H_STRING}: '{self.h_string}' />"
+        """Get string representation method."""
+        return f"OrgUnit {ORG_ID}: '{self.id}'  {H_LEVEL}: {self.h_level}  {H_STRING}: '{self.h_string}'"
 
 
 @lru_cache
 def compare_adjacent_orgs(org1: OrgUnit, org2: OrgUnit) -> bool:
+    """Algorithmic MacDaddy of this POC.
+
+    This algorithm should only compare Org Units that are adjacent (as in above or below in tree)
+    to each other in the Tree Hierarchy.
+
+    IF: Orgs have same id -> True
+
+    IF: Org levels are not 1 level apart -> False
+
+    IF: Sliced Level Lists are equal -> TRUE
+
+    ELSE: FALSE
+
+    Org Level Lists are sliced based on the lowest level org.
+    """
     print("Now inside compare function!\n")
     # if comparing the same object, return true
     if org1.id == org2.id:
@@ -44,7 +78,9 @@ def compare_adjacent_orgs(org1: OrgUnit, org2: OrgUnit) -> bool:
         lowest_common_level = org1.h_level if org1.h_level < org2.h_level else org2.h_level
 
     # slice lists to common length to compare parent relationship
-    parent_list1, parent_list2 = org1.get_levels(lowest_common_level), org2.get_levels(lowest_common_level)
+    parent_list1, parent_list2 = org1.get_levels(lowest_common_level), org2.get_levels(
+        lowest_common_level
+    )
     print(f"Parent Hierarchy of Org 1: {parent_list1}")
     print(f"Parent Hierarchy of Org 2: {parent_list2}")
 
