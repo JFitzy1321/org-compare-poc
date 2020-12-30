@@ -112,7 +112,8 @@ if __name__ == "__main__":
         print(f"\nAre Orgs Hierarchical Related: {compare_adjacent_orgs(org1, org2)}\n")
 
         # Loop again or exit?
-        if input("Again? y/n : ").lower() in ("y", ""):
+        loop_again = input("Again? y/n : ")
+        if not loop_again or loop_again.lower()[0] == "y":
             continue
         else:
             break
